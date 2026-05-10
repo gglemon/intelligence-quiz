@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trivia Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1226;
+    --card: #1f2348;
+    --card-2: #262b58;
+    --accent: #f5c518;
+    --accent-2: #ff5e7e;
+    --good: #3fd17a;
+    --bad: #ff5b5b;
+    --easy: #3fd17a;
+    --medium: #f5c518;
+    --hard: #ff5e7e;
+    --text: #f5f7ff;
+    --muted: #a4abd0;
+    --border: #2e3470;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Times New Roman", Times, serif;
+    background: radial-gradient(1200px 600px at 10% -10%, #2a2160 0%, transparent 60%),
+                radial-gradient(900px 500px at 100% 110%, #5b1d4d 0%, transparent 60%),
+                var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  .title-font { font-family: "Bungee Shade", "Times New Roman", serif; letter-spacing: 1px; }
+
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    margin: 0 0 6px;
+    font-family: "Bungee Shade", "Times New Roman", serif;
+    font-size: 44px;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { margin: 0; color: var(--muted); font-size: 16px; }
+  h2 { font-family: "Bungee Shade", "Times New Roman", serif; letter-spacing: 1px; }
+
+  /* Start screen */
+  .difficulty-pick {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .pick-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .pick-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .pick-num {
+    font-family: "Bungee Shade", "Times New Roman", serif;
+    font-size: 56px;
+    line-height: 1;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pick-label { color: var(--text); font-size: 16px; margin: 8px 0 4px; font-weight: 700; }
+  .pick-desc { color: var(--muted); font-size: 13px; }
+
+  .points-legend {
+    display: flex; justify-content: center; gap: 18px; margin-top: 28px; flex-wrap: wrap;
+    color: var(--muted); font-size: 13px;
+  }
+  .points-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* Progress bar */
+  .progress-bar {
+    position: sticky; top: 0; z-index: 5;
+    background: rgba(15, 18, 38, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 10px 0; margin: 0 -20px 16px;
+    padding-left: 20px; padding-right: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-track { width: 100%; height: 8px; background: var(--card); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width 0.25s ease; }
+  .progress-meta { display: flex; justify-content: space-between; margin-top: 6px; font-size: 13px; color: var(--muted); }
+
+  /* Question card */
+  .question {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+  .q-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .q-num { color: var(--accent); font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+  .q-meta { display: inline-flex; gap: 8px; align-items: center; }
+  .q-pts, .q-diff { color: var(--muted); font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--card-2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .q-diff.easy { color: var(--easy); }
+  .q-diff.medium { color: var(--medium); }
+  .q-diff.hard { color: var(--hard); }
+
+  .q-text { font-size: 17px; line-height: 1.4; margin: 0 0 14px; }
+
+  .options { display: grid; gap: 8px; }
+  .option {
+    display: flex; align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--card-2);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .option:hover { background: #2f3568; }
+  .option input { accent-color: var(--accent); }
+  .option.selected { border-color: var(--accent); background: var(--card-2); }
+
+  .actions { display: flex; justify-content: center; margin-top: 24px; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: #1a1a1a;
+    border: none;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 24px rgba(245, 197, 24, 0.3);
+    transition: transform 0.1s ease;
+    font-family: "Times New Roman", Times, serif;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.secondary { background: var(--card-2); color: var(--text); box-shadow: none; border: 1px solid var(--border); }
+
+  /* Results */
+  .result-card {
+    background: linear-gradient(135deg, #2b2469 0%, #4a1d56 100%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .score-ring {
+    display: inline-block;
+    font-family: "Bungee Shade", "Times New Roman", serif;
+    font-size: 56px;
+    line-height: 1.1;
+    margin: 8px 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .score-ring small { font-size: 22px; color: var(--muted); -webkit-text-fill-color: var(--muted); font-family: "Times New Roman", Times, serif; }
+  .tier { font-family: "Bungee Shade", "Times New Roman", serif; font-size: 22px; margin: 8px 0 4px; letter-spacing: 1px; }
+  .tier-blurb { color: var(--muted); margin: 0; }
+  .pct { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* Review */
+  .review-q {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--good);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-size: 14.5px;
+  }
+  .review-q.wrong { border-left-color: var(--bad); }
+  .review-q .label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin-bottom: 4px;
+  }
+  .review-q .your { color: #ffd9d9; }
+  .review-q .correct { color: #cdf3da; }
+  .review-q.right .your { color: #cdf3da; }
+  .badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+  .badge.right { background: rgba(63, 209, 122, 0.2); color: var(--good); }
+  .badge.wrong { background: rgba(255, 91, 91, 0.2); color: var(--bad); }
+
+  .empty-warning {
+    background: rgba(255, 91, 91, 0.12);
+    color: #ffb1b1;
+    border: 1px solid rgba(255, 91, 91, 0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 14px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+
+<script>
+  const POINTS = { easy: 2, medium: 4, hard: 7 };
+
+  const STRATIFIED_PICKS = {
+    10: { easy: 6, medium: 3, hard: 1 },
+    20: { easy: 12, medium: 6, hard: 2 },
+    30: { easy: 18, medium: 9, hard: 3 },
+  };
+
+  const TIERS = [
+    { min: 0.90, label: "Trivia Genius",        blurb: "Encyclopedia energy. Are you sure you weren't peeking?" },
+    { min: 0.75, label: "Trivia Master",        blurb: "Sharp, well-read, and clearly dangerous at pub quiz night." },
+    { min: 0.60, label: "Knowledgeable",        blurb: "Solid all-rounder — a respectable showing." },
+    { min: 0.40, label: "Casual Learner",       blurb: "Some hits, some misses. The trivia world is your oyster." },
+    { min: 0.20, label: "Just Getting Started", blurb: "Plenty of room to grow — every genius was a beginner once." },
+    { min: 0.00, label: "Better Luck Next Time", blurb: "Hey, at least you showed up. Wikipedia is right there." },
+  ];
+
+  // Question pool — all multiple choice. correctIndex points into options.
+  const QUESTION_POOL = [
+    // ---------- EASY (30) ----------
+    { difficulty: "easy", q: "What is the capital of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Perth"], correctIndex: 2 },
+    { difficulty: "easy", q: "How many continents are there on Earth?", options: ["5", "6", "7", "8"], correctIndex: 2 },
+    { difficulty: "easy", q: "Who painted the Mona Lisa?", options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"], correctIndex: 2 },
+    { difficulty: "easy", q: "In what year did World War II end?", options: ["1942", "1945", "1948", "1939"], correctIndex: 1 },
+    { difficulty: "easy", q: "What is the largest mammal on Earth?", options: ["African elephant", "Giraffe", "Blue whale", "Polar bear"], correctIndex: 2 },
+    { difficulty: "easy", q: "Which element has the atomic number 1?", options: ["Helium", "Hydrogen", "Oxygen", "Carbon"], correctIndex: 1 },
+    { difficulty: "easy", q: "Who was the first person to walk on the moon?", options: ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "John Glenn"], correctIndex: 2 },
+    { difficulty: "easy", q: "How many sides does a hexagon have?", options: ["5", "6", "7", "8"], correctIndex: 1 },
+    { difficulty: "easy", q: "Which gas do plants primarily absorb from the atmosphere?", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Methane"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the largest hot desert in the world?", options: ["Gobi", "Kalahari", "Sahara", "Arabian"], correctIndex: 2 },
+    { difficulty: "easy", q: "Who developed the theory of relativity?", options: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Niels Bohr"], correctIndex: 1 },
+    { difficulty: "easy", q: "How many strings does a standard guitar have?", options: ["4", "5", "6", "7"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the main language spoken in Brazil?", options: ["Spanish", "English", "Portuguese", "French"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the largest ocean on Earth?", options: ["Atlantic", "Indian", "Pacific", "Arctic"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the hardest naturally occurring substance on Earth?", options: ["Quartz", "Granite", "Diamond", "Iron"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the official currency of Japan?", options: ["Won", "Yen", "Yuan", "Ringgit"], correctIndex: 1 },
+    { difficulty: "easy", q: "Who wrote \"Romeo and Juliet\"?", options: ["Charles Dickens", "William Shakespeare", "Ernest Hemingway", "Leo Tolstoy"], correctIndex: 1 },
+    { difficulty: "easy", q: "Mount Everest is part of which mountain range?", options: ["Andes", "Rockies", "Alps", "Himalayas"], correctIndex: 3 },
+    { difficulty: "easy", q: "The Great Wall is in which country?", options: ["Japan", "India", "China", "Mongolia"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the fastest land animal?", options: ["Lion", "Cheetah", "Horse", "Greyhound"], correctIndex: 1 },
+    { difficulty: "easy", q: "Water boils at what temperature in Celsius (at standard pressure)?", options: ["50", "75", "100", "212"], correctIndex: 2 },
+    { difficulty: "easy", q: "The pyramids of Giza are in which country?", options: ["Mexico", "Sudan", "Egypt", "Iraq"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the square root of 144?", options: ["10", "11", "12", "14"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the smallest planet in our solar system?", options: ["Mars", "Venus", "Mercury", "Pluto"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the capital of France?", options: ["London", "Madrid", "Paris", "Berlin"], correctIndex: 2 },
+    { difficulty: "easy", q: "How many days are in a leap year?", options: ["364", "365", "366", "367"], correctIndex: 2 },
+    { difficulty: "easy", q: "What is the currency of the United Kingdom?", options: ["Euro", "Pound sterling", "Krona", "Franc"], correctIndex: 1 },
+    { difficulty: "easy", q: "How many planets are officially recognized in our solar system?", options: ["7", "8", "9", "10"], correctIndex: 1 },
+    { difficulty: "easy", q: "How many wheels does a unicycle have?", options: ["1", "2", "3", "4"], correctIndex: 0 },
+    { difficulty: "easy", q: "What is H₂O commonly known as?", options: ["Salt", "Water", "Sugar", "Oxygen"], correctIndex: 1 },
+
+    // ---------- MEDIUM (20) ----------
+    { difficulty: "medium", q: "Which planet has the most moons? (Jupiter and Saturn are neck-and-neck — pick the current leader by confirmed count.)", options: ["Jupiter", "Saturn", "Uranus", "Neptune"], correctIndex: 1 },
+    { difficulty: "medium", q: "The chemical symbol for gold is?", options: ["Ag", "Au", "Gd", "Go"], correctIndex: 1 },
+    { difficulty: "medium", q: "Which is the smallest country in the world by area?", options: ["Monaco", "San Marino", "Vatican City", "Liechtenstein"], correctIndex: 2 },
+    { difficulty: "medium", q: "Which Shakespeare play features the line \"To be, or not to be\"?", options: ["Macbeth", "Othello", "King Lear", "Hamlet"], correctIndex: 3 },
+    { difficulty: "medium", q: "The longest river in the world (by most accepted measure) is the?", options: ["Amazon", "Nile", "Yangtze", "Mississippi"], correctIndex: 1 },
+    { difficulty: "medium", q: "How many bones are in the adult human body?", options: ["186", "206", "226", "246"], correctIndex: 1 },
+    { difficulty: "medium", q: "What is the capital of Canada?", options: ["Toronto", "Vancouver", "Ottawa", "Montreal"], correctIndex: 2 },
+    { difficulty: "medium", q: "Who wrote the novel \"1984\"?", options: ["Aldous Huxley", "George Orwell", "Ray Bradbury", "Kurt Vonnegut"], correctIndex: 1 },
+    { difficulty: "medium", q: "In what year was the first iPhone released?", options: ["2005", "2006", "2007", "2008"], correctIndex: 2 },
+    { difficulty: "medium", q: "Which continent has the most countries?", options: ["Asia", "Europe", "Africa", "South America"], correctIndex: 2 },
+    { difficulty: "medium", q: "The currency of Switzerland is the?", options: ["Euro", "Swiss Franc", "Krone", "Swiss Mark"], correctIndex: 1 },
+    { difficulty: "medium", q: "Who is most commonly credited with inventing the telephone?", options: ["Thomas Edison", "Alexander Graham Bell", "Nikola Tesla", "Guglielmo Marconi"], correctIndex: 1 },
+    { difficulty: "medium", q: "Pi (π) to two decimal places is?", options: ["3.12", "3.14", "3.16", "3.41"], correctIndex: 1 },
+    { difficulty: "medium", q: "Who painted \"The Starry Night\"?", options: ["Pablo Picasso", "Claude Monet", "Vincent van Gogh", "Paul Cézanne"], correctIndex: 2 },
+    { difficulty: "medium", q: "The speed of light is approximately how many km/s?", options: ["30,000", "300,000", "3,000,000", "30,000,000"], correctIndex: 1 },
+    { difficulty: "medium", q: "What is the capital of Italy?", options: ["Milan", "Naples", "Rome", "Florence"], correctIndex: 2 },
+    { difficulty: "medium", q: "What is the largest planet in our solar system?", options: ["Saturn", "Jupiter", "Neptune", "Uranus"], correctIndex: 1 },
+    { difficulty: "medium", q: "Who wrote \"Pride and Prejudice\"?", options: ["Charlotte Brontë", "Jane Austen", "George Eliot", "Virginia Woolf"], correctIndex: 1 },
+    { difficulty: "medium", q: "Which element has the chemical symbol Fe?", options: ["Fluorine", "Iron", "Francium", "Ferrium"], correctIndex: 1 },
+    { difficulty: "medium", q: "Which is the second-largest country by total area?", options: ["China", "Canada", "United States", "Brazil"], correctIndex: 1 },
+
+    // ---------- HARD (10) ----------
+    { difficulty: "hard", q: "In what year did the Berlin Wall fall?", options: ["1987", "1989", "1991", "1985"], correctIndex: 1 },
+    { difficulty: "hard", q: "Who is credited with discovering penicillin?", options: ["Louis Pasteur", "Alexander Fleming", "Marie Curie", "Jonas Salk"], correctIndex: 1 },
+    { difficulty: "hard", q: "What is the capital of Mongolia?", options: ["Astana", "Ulaanbaatar", "Bishkek", "Tashkent"], correctIndex: 1 },
+    { difficulty: "hard", q: "Who composed Symphony No. 9, which contains \"Ode to Joy\"?", options: ["Wolfgang Mozart", "Ludwig van Beethoven", "Johann Sebastian Bach", "Johannes Brahms"], correctIndex: 1 },
+    { difficulty: "hard", q: "What is element number 79 on the periodic table?", options: ["Silver", "Gold", "Platinum", "Mercury"], correctIndex: 1 },
+    { difficulty: "hard", q: "Who was the first female Prime Minister of the United Kingdom?", options: ["Theresa May", "Margaret Thatcher", "Liz Truss", "Indira Gandhi"], correctIndex: 1 },
+    { difficulty: "hard", q: "Which country has the largest land area in the world?", options: ["China", "United States", "Russia", "Canada"], correctIndex: 2 },
+    { difficulty: "hard", q: "The deepest known point in Earth's oceans is the?", options: ["Puerto Rico Trench", "Mariana Trench", "Tonga Trench", "Java Trench"], correctIndex: 1 },
+    { difficulty: "hard", q: "Who painted \"The Persistence of Memory\" (the famous melting clocks)?", options: ["Pablo Picasso", "Salvador Dalí", "René Magritte", "Joan Miró"], correctIndex: 1 },
+    { difficulty: "hard", q: "Whose face appears on the United States $100 bill?", options: ["George Washington", "Abraham Lincoln", "Benjamin Franklin", "Thomas Jefferson"], correctIndex: 2 },
+  ];
+
+  // ---- App state ----
+  let activeQuestions = [];
+  let responses = [];
+
+  // ---- Utilities ----
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function pickQuestions(count) {
+    const split = STRATIFIED_PICKS[count];
+    const byDiff = {
+      easy: shuffle(QUESTION_POOL.filter(q => q.difficulty === "easy")),
+      medium: shuffle(QUESTION_POOL.filter(q => q.difficulty === "medium")),
+      hard: shuffle(QUESTION_POOL.filter(q => q.difficulty === "hard")),
+    };
+    const picked = [
+      ...byDiff.easy.slice(0, split.easy),
+      ...byDiff.medium.slice(0, split.medium),
+      ...byDiff.hard.slice(0, split.hard),
+    ];
+    return shuffle(picked);
+  }
+
+  function totalPossiblePoints(questions) {
+    return questions.reduce((s, q) => s + POINTS[q.difficulty], 0);
+  }
+
+  function pickTier(pct) {
+    return TIERS.find(t => pct >= t.min);
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  // ---- Screens ----
+  function renderStart() {
+    const app = document.getElementById("app");
+    app.innerHTML = `
+      <header>
+        <h1>Trivia Challenge</h1>
+        <p>Pick how many questions you want to face. Harder ones are worth more.</p>
+      </header>
+      <div class="difficulty-pick">
+        <div class="pick-card" data-count="10">
+          <div class="pick-num">10</div>
+          <div class="pick-label">Quick Round</div>
+          <div class="pick-desc">~31 points · short and sweet</div>
+        </div>
+        <div class="pick-card" data-count="20">
+          <div class="pick-num">20</div>
+          <div class="pick-label">Standard Round</div>
+          <div class="pick-desc">~62 points · balanced challenge</div>
+        </div>
+        <div class="pick-card" data-count="30">
+          <div class="pick-num">30</div>
+          <div class="pick-label">Full Challenge</div>
+          <div class="pick-desc">~93 points · go the distance</div>
+        </div>
+      </div>
+      <div class="points-legend">
+        <span><span class="dot" style="background: var(--easy);"></span> Easy = ${POINTS.easy} pts</span>
+        <span><span class="dot" style="background: var(--medium);"></span> Medium = ${POINTS.medium} pts</span>
+        <span><span class="dot" style="background: var(--hard);"></span> Hard = ${POINTS.hard} pts</span>
+      </div>
+    `;
+    app.querySelectorAll(".pick-card").forEach(card => {
+      card.addEventListener("click", () => startQuiz(parseInt(card.dataset.count, 10)));
+    });
+  }
+
+  function startQuiz(count) {
+    activeQuestions = pickQuestions(count);
+    responses = new Array(activeQuestions.length).fill(null);
+    renderQuiz();
+  }
+
+  function renderQuiz() {
+    const app = document.getElementById("app");
+    const total = totalPossiblePoints(activeQuestions);
+    app.innerHTML = `
+      <header>
+        <h1>Trivia Challenge</h1>
+        <p>${activeQuestions.length} questions · ${total} points possible</p>
+      </header>
+      <div class="progress-bar">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-meta">
+          <span id="answeredCount">0 / ${activeQuestions.length} answered</span>
+          <span>${total} pts available</span>
+        </div>
+      </div>
+      <div id="quiz"></div>
+      <div id="warning"></div>
+      <div class="actions">
+        <button class="btn secondary" id="quitBtn">Back to Start</button>
+        <button class="btn" id="submitBtn">Submit & See My Score</button>
+      </div>
+    `;
+
+    const quiz = document.getElementById("quiz");
+    activeQuestions.forEach((q, i) => {
+      const card = document.createElement("div");
+      card.className = "question";
+      card.id = `q-${i}`;
+
+      const head = document.createElement("div");
+      head.className = "q-head";
+      head.innerHTML = `
+        <span class="q-num">Question ${i + 1}</span>
+        <span class="q-meta">
+          <span class="q-diff ${q.difficulty}">${q.difficulty}</span>
+          <span class="q-pts">${POINTS[q.difficulty]} pts</span>
+        </span>
+      `;
+      card.appendChild(head);
+
+      const text = document.createElement("p");
+      text.className = "q-text";
+      text.textContent = q.q;
+      card.appendChild(text);
+
+      const opts = document.createElement("div");
+      opts.className = "options";
+      q.options.forEach((opt, j) => {
+        const id = `q${i}-opt${j}`;
+        const label = document.createElement("label");
+        label.className = "option";
+        label.htmlFor = id;
+        label.innerHTML = `
+          <input type="radio" id="${id}" name="q-${i}" value="${j}" />
+          <span>${escapeHTML(opt)}</span>
+        `;
+        label.querySelector("input").addEventListener("change", () => {
+          responses[i] = j;
+          opts.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+          label.classList.add("selected");
+          updateProgress();
+        });
+        opts.appendChild(label);
+      });
+      card.appendChild(opts);
+      quiz.appendChild(card);
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", handleSubmit);
+    document.getElementById("quitBtn").addEventListener("click", () => {
+      if (confirm("Leave this round and go back to the start screen?")) renderStart();
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const answered = responses.filter(r => r !== null).length;
+    const fill = document.getElementById("progressFill");
+    const count = document.getElementById("answeredCount");
+    if (fill) fill.style.width = `${(answered / activeQuestions.length) * 100}%`;
+    if (count) count.textContent = `${answered} / ${activeQuestions.length} answered`;
+  }
+
+  function handleSubmit() {
+    const answered = responses.filter(r => r !== null).length;
+    const warn = document.getElementById("warning");
+    if (answered < activeQuestions.length) {
+      warn.innerHTML = `<div class="empty-warning">You have ${activeQuestions.length - answered} unanswered question(s). Submit anyway? <button class="btn secondary" id="confirmSubmit" style="margin-left: 10px; padding: 8px 16px; font-size: 13px;">Yes, submit</button></div>`;
+      document.getElementById("confirmSubmit").addEventListener("click", showResults);
+      warn.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults() {
+    const total = totalPossiblePoints(activeQuestions);
+    let score = 0;
+    activeQuestions.forEach((q, i) => {
+      if (responses[i] === q.correctIndex) score += POINTS[q.difficulty];
+    });
+    const pct = total === 0 ? 0 : score / total;
+    const tier = pickTier(pct);
+
+    const app = document.getElementById("app");
+    app.innerHTML = `
+      <header>
+        <h1>Your Result</h1>
+        <p>${activeQuestions.length}-question round</p>
+      </header>
+      <div class="result-card">
+        <div class="score-ring">${score}<small> / ${total}</small></div>
+        <div class="pct">${Math.round(pct * 100)}%</div>
+        <div class="tier">${tier.label}</div>
+        <p class="tier-blurb">${tier.blurb}</p>
+      </div>
+      <h2 style="margin: 24px 0 12px; font-size: 22px;">Review</h2>
+      <div id="review"></div>
+      <div class="actions" style="margin-top: 28px;">
+        <button class="btn" id="newRound">Play Again (New Questions)</button>
+        <button class="btn secondary" id="backStart">Choose Different Length</button>
+      </div>
+    `;
+
+    const review = document.getElementById("review");
+    activeQuestions.forEach((q, i) => {
+      const correct = responses[i] === q.correctIndex;
+      const yourIdx = responses[i];
+      const yourText = yourIdx == null ? "(no answer)" : q.options[yourIdx];
+      const correctText = q.options[q.correctIndex];
+      const pts = POINTS[q.difficulty];
+      const item = document.createElement("div");
+      item.className = `review-q ${correct ? "right" : "wrong"}`;
+      item.innerHTML = `
+        <div class="label">
+          Question ${i + 1} ·
+          <span class="q-diff ${q.difficulty}" style="background: transparent; padding: 0;">${q.difficulty}</span> ·
+          ${pts} pts
+          <span class="badge ${correct ? "right" : "wrong"}">${correct ? `+${pts}` : "0"}</span>
+        </div>
+        <div style="margin-bottom: 6px;">${escapeHTML(q.q)}</div>
+        <div class="your"><strong>Your answer:</strong> ${escapeHTML(yourText)}</div>
+        ${correct ? "" : `<div class="correct"><strong>Correct answer:</strong> ${escapeHTML(correctText)}</div>`}
+      `;
+      review.appendChild(item);
+    });
+
+    document.getElementById("newRound").addEventListener("click", () => {
+      startQuiz(activeQuestions.length);
+    });
+    document.getElementById("backStart").addEventListener("click", renderStart);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Boot
+  renderStart();
+</script>
+</body>
+</html>
