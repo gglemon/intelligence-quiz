@@ -455,10 +455,10 @@ body {
 /* Result */
 .result h1 {
   font-family: var(--font-display);
-  font-size: 80px;
+  font-size: 120px;
   font-weight: 400;
   line-height: 0.95;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   letter-spacing: -0.03em;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
@@ -473,16 +473,16 @@ body {
 }
 .result .out-of {
   color: var(--fg-faint);
-  font-size: 14px;
-  margin-bottom: 22px;
+  font-size: 18px;
+  margin-bottom: 28px;
   font-variant-numeric: tabular-nums;
 }
 .result .tier-label {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: 44px;
   font-weight: 400;
   font-style: italic;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   color: var(--fg);
   letter-spacing: -0.01em;
   line-height: 1.1;
@@ -490,9 +490,9 @@ body {
 .result .tier-blurb {
   color: var(--fg-dim);
   line-height: 1.55;
-  margin-bottom: 28px;
-  font-size: 16px;
-  max-width: 540px;
+  margin-bottom: 36px;
+  font-size: 20px;
+  max-width: 620px;
 }
 .warn {
   background: var(--accent-soft);
@@ -513,26 +513,26 @@ body {
 .signs-list {
   background: var(--bg-elev);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 22px 24px;
-  margin-bottom: 24px;
+  border-radius: 20px;
+  padding: 28px 30px;
+  margin-bottom: 28px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 .signs-list h3 {
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--fg-faint);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-weight: 600;
 }
 .sign-row {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 8px 0;
-  font-size: 16px;
+  gap: 16px;
+  padding: 10px 0;
+  font-size: 20px;
   line-height: 1.4;
   animation: signIn 0.5s var(--ease-smooth) both;
 }
@@ -549,16 +549,16 @@ body {
   to { opacity: 1; transform: translateX(0); }
 }
 .sign-icon {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 .sign-icon.match {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
@@ -604,11 +604,11 @@ body {
   .question-text { font-size: 30px; margin-bottom: 32px; }
   .option { font-size: 17px; padding: 18px 22px; }
   .options.row { gap: 10px; }
-  .result h1 { font-size: 64px; }
-  .result .tier-label { font-size: 24px; }
-  .result .tier-blurb { font-size: 15px; }
-  .sign-row { font-size: 14px; gap: 12px; }
-  .signs-list { padding: 18px; }
+  .result h1 { font-size: 88px; }
+  .result .tier-label { font-size: 34px; }
+  .result .tier-blurb { font-size: 18px; }
+  .sign-row { font-size: 17px; gap: 14px; }
+  .signs-list { padding: 22px; }
   .btn { font-size: 15px; padding: 14px 26px; }
   .scale-dot { max-width: none; font-size: 18px; }
   .scale-labels { font-size: 16px; }
@@ -620,7 +620,7 @@ body {
 @media (max-width: 420px) {
   .welcome h1 { font-size: 46px; }
   .question-text { font-size: 24px; }
-  .result h1 { font-size: 56px; }
-  .result .tier-label { font-size: 22px; }
+  .result h1 { font-size: 72px; }
+  .result .tier-label { font-size: 28px; }
   .scale-labels { font-size: 14px; }
 }
