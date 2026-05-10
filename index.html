@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Are You Highly Intelligent?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="theme-dark">
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="theme-switcher" title="Change theme">
+    <button data-theme="dark" title="Dark" aria-label="Dark theme">☾</button>
+    <button data-theme="light" title="Light" aria-label="Light theme">☼</button>
+    <button data-theme="playful" title="Playful" aria-label="Playful theme">✦</button>
+    <button data-theme="custom" title="Custom color" aria-label="Custom color" id="custom-theme-btn">
+      <span class="custom-swatch" id="custom-swatch"></span>
+    </button>
+    <input type="color" id="custom-color-input" aria-hidden="true" />
+  </div>
+  <main class="app" id="app"></main>
+  <script src="questions.js"></script>
+  <script src="quiz.js"></script>
+</body>
+</html>
